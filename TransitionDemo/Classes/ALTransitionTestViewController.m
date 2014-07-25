@@ -26,11 +26,21 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil index:(NSInteger)index {
     self = [self initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     self.index = index;
+    [self commonInit];
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    [self commonInit];
+    return self;
+}
+
+- (void)commonInit {
     if (![[NSUserDefaults standardUserDefaults] objectForKey:AL_SPEED_KEY]) {
         [self _defaultsSettings];
     }
     [self _retrieveSettings];
-    return self;
 }
 
 - (void)viewDidLoad {
@@ -54,8 +64,7 @@
         default:
             break;
     }
-    [_cellColor release];
-    _cellColor = [color retain];
+    _cellColor = color;
     
     [self _setupBarButtonItems];
 }
@@ -64,20 +73,6 @@
     [super viewWillAppear:animated];
     [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
     [self _retrieveSettings];
-}
-
-- (void)viewDidUnload {
-    [self setSettingsButton:nil];
-    [self setBackButton:nil];
-    [super viewDidUnload];
-}
-
-- (void)dealloc {
-    [_cellColor release];
-    [_tableView release];
-    [_settingsButton release];
-    [_backButton release];
-    [super dealloc];   
 }
 
 #pragma mark -
@@ -111,7 +106,6 @@
     imageView.frame = headerView.frame;
     imageView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [headerView addSubview:imageView];
-    [imageView release];
     
     UILabel * label = [[UILabel alloc] initWithFrame:headerView.frame];
     label.backgroundColor = [UIColor clearColor];
@@ -120,7 +114,6 @@
     label.font = [UIFont boldSystemFontOfSize:12.0f];
     label.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [headerView addSubview:label];
-    [label release];
     switch (section) {
         case 0:
             label.text = @"ADDualTransition";
@@ -130,19 +123,15 @@
             break;
     }
     
-    return [headerView autorelease];
+    return headerView;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString * sCellIdentifier = @"CellIdentifier";
-    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:sCellIdentifier];
-    if (!cell) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:sCellIdentifier] autorelease];
-    }
+    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:sCellIdentifier forIndexPath:indexPath];
     
     UIView * backgroundView = [[UIView alloc] initWithFrame:cell.frame];
     cell.backgroundView = backgroundView;
-    [backgroundView release];
     
     NSString * text = nil;
     switch (indexPath.section) {
@@ -207,8 +196,6 @@
             break;
     }
     cell.textLabel.text = text;
-    cell.textLabel.textAlignment = NSTextAlignmentCenter;
-    cell.textLabel.textColor = [UIColor colorWithWhite:0.925f alpha:1.0f];
     
     return cell;
 }
@@ -284,115 +271,97 @@
 #pragma mark Actions
 
 - (IBAction)pop:(id)sender {
-    if (AD_SYSTEM_VERSION_GREATER_THAN_7) {
-        [self.navigationController popViewControllerAnimated:YES];
-    } else {
-        [self.transitionController popViewController];
-    }
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)slide:(id)sender {
     ADTransition * animation = [[ADSlideTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)fade:(id)sender {
     ADTransition * animation = [[ADFadeTransition alloc] initWithDuration:_duration];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)backFade:(id)sender {
     ADTransition * animation = [[ADBackFadeTransition alloc] initWithDuration:_duration];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)ghost:(id)sender {
     ADTransition * animation = [[ADGhostTransition alloc] initWithDuration:_duration];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)cube:(id)sender {
     ADTransition * animation = [[ADCubeTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)carrousel:(id)sender {
     ADTransition * animation = [[ADCarrouselTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)cross:(id)sender {
     ADTransition * animation = [[ADCrossTransition alloc] initWithDuration:_duration];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)swipe:(id)sender {
     ADTransition * animation = [[ADSwipeTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)swipeFade:(id)sender {
     ADTransition * animation = [[ADSwipeFadeTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)scale:(id)sender {
     ADTransition * animation = [[ADScaleTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)glue:(id)sender {
     ADTransition * animation = [[ADGlueTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)pushRotate:(id)sender {
     ADTransition * animation = [[ADPushRotateTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)fold:(id)sender {
     ADTransition * animation = [[ADFoldTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)swap:(id)sender {
     ADTransition * animation = [[ADSwapTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)flip:(id)sender {
     ADDualTransition * animation = [[ADFlipTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)focus:(id)sender {
     CGRect sourceRect = [sender frame];
     sourceRect.origin.y = sourceRect.origin.y - self.tableView.contentOffset.y;
     ADTransition * animation = [[ADZoomTransition alloc] initWithSourceRect:sourceRect andTargetRect:self.view.frame forDuration:_duration];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 - (IBAction)push:(id)sender {
     ADTransition * animation = [[ADModernPushTransition alloc] initWithDuration:_duration orientation:_orientation sourceRect:self.view.frame];
     [self _pushViewControllerWithTransition:animation];
-    [animation release];
 }
 
 - (IBAction)showSettings:(id)sender {
-    ALSettingsViewController * settingsViewController = [[ALSettingsViewController alloc] init];
-    settingsViewController.delegate = self;
-    UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
-    [self presentViewController:navigationController animated:YES completion:nil];
-    [settingsViewController release];
-    [navigationController release];
+    [self performSegueWithIdentifier:@"showSettings" sender:nil];
 }
 
 - (IBAction)back:(id)sender {
-    if (AD_SYSTEM_VERSION_GREATER_THAN_7) {
-        [self.navigationController popViewControllerAnimated:YES];
-    } else {
-        [self.transitionController popViewController];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+#pragma mark -
+#pragma mark Navigation methods
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"showSettings"]) {
+        UINavigationController * navigationController = segue.destinationViewController;
+        ALSettingsViewController * settingsViewController = navigationController.viewControllers[0];
+        settingsViewController.delegate = self;
     }
 }
 
@@ -413,13 +382,8 @@
     _orientation = [[defaults objectForKey:AL_ORIENTATION_KEY] intValue];
     BOOL navigationBarHidden = [[defaults objectForKey:AL_NAVIGATION_BAR_HIDDEN_KEY] boolValue];
     BOOL toolbarHidden = [[defaults objectForKey:AL_TOOLBAR_HIDDEN_KEY] boolValue];
-    if (AD_SYSTEM_VERSION_GREATER_THAN_7) {
-        [self.navigationController setNavigationBarHidden:navigationBarHidden];
-        [self.navigationController setToolbarHidden:toolbarHidden];
-    } else {
-        [self.transitionController setNavigationBarHidden:navigationBarHidden];
-        [self.transitionController setToolbarHidden:toolbarHidden];
-    }
+    [self.navigationController setNavigationBarHidden:navigationBarHidden];
+    [self.navigationController setToolbarHidden:toolbarHidden];
     self.backButton.hidden = !navigationBarHidden || self.index == 0;
     self.settingsButton.hidden = !navigationBarHidden;
 }
@@ -443,7 +407,6 @@
         UIBarButtonItem * backButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
         self.navigationItem.backBarButtonItem = nil;
         self.navigationItem.leftBarButtonItem = backButtonItem;
-        [backButtonItem release];
     }
     
     UIButton * settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -453,11 +416,9 @@
     [settingsButton addTarget:self action:@selector(showSettings:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem * settingsButtonItem = [[UIBarButtonItem alloc] initWithCustomView:settingsButton];
     self.navigationItem.rightBarButtonItem = settingsButtonItem;
-    [settingsButtonItem release];
 
     UIBarButtonItem * shareButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(_share:)];
     self.toolbarItems = @[shareButtonItem];
-    [shareButtonItem release];
 }
 
 - (void)_share:(id)sender {
@@ -467,13 +428,9 @@
 }
 
 - (void)_pushViewControllerWithTransition:(ADTransition *)transition {
-    ALTransitionTestViewController * viewController = [[ALTransitionTestViewController alloc] initWithNibName:@"ALTransitionTestViewController" bundle:nil index:self.index+1];
-    if (AD_SYSTEM_VERSION_GREATER_THAN_7) {
-        viewController.transition = transition;
-        [self.navigationController pushViewController:viewController animated:YES];
-    } else {
-        [self.transitionController pushViewController:viewController withTransition:transition];
-    }
-    [viewController release];
+    ALTransitionTestViewController * viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"ALTransitionTestViewController"];
+    viewController.index = self.index+1;
+    viewController.transition = transition;
+    [self.navigationController pushViewController:viewController animated:YES];
 }
 @end

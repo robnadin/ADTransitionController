@@ -10,15 +10,4 @@
 
 @implementation ALSettingsTableViewCell
 
-+ (id)newCell {
-    NSArray * nibViews = [[NSBundle mainBundle] loadNibNamed:@"ALSettingsTableViewCell" owner:self options:nil];
-    return [[nibViews lastObject] retain];
-}
-
-- (void)dealloc {
-    [_orientationLabel release];
-    [_checkImageView release];
-    [super dealloc];
-}
-
 @end

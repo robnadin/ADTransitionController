@@ -10,17 +10,15 @@
 #import "ALSettingsViewController.h"
 #import "ADTransitionController.h"
 
-#define AD_SYSTEM_VERSION_GREATER_THAN_7 ([[[UIDevice currentDevice] systemVersion] compare:@"7" options:NSNumericSearch] == NSOrderedDescending)
-
 @interface ALTransitionTestViewController : ADTransitioningViewController <UITableViewDataSource, UITableViewDelegate, ALSettingsDelegate> {
     NSInteger _index;
     CGFloat _duration;
     ADTransitionOrientation _orientation;
 }
 
-@property (retain, nonatomic) IBOutlet UIButton * settingsButton;
-@property (retain, nonatomic) IBOutlet UIButton * backButton;
-@property (retain, nonatomic) IBOutlet UITableView * tableView;
+@property (strong, nonatomic) IBOutlet UIButton * settingsButton;
+@property (strong, nonatomic) IBOutlet UIButton * backButton;
+@property (strong, nonatomic) IBOutlet UITableView * tableView;
 @property (nonatomic) NSInteger index;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil index:(NSInteger)index;

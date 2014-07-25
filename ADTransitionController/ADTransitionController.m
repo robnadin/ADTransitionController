@@ -20,8 +20,6 @@
 }
 @end
 
-NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssociationKey";
-
 #define AD_NAVIGATION_BAR_HEIGHT 44.0f
 #define AD_TOOLBAR_HEIGHT 44.0f
 #define AD_Z_DISTANCE 1000.0f
@@ -39,12 +37,6 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
 @end
 
 @implementation ADTransitionController
-@synthesize viewControllers = _viewControllers;
-@synthesize topViewController = _topViewController;
-@synthesize visibleViewController = _visibleViewController;
-@synthesize delegate = _delegate;
-@synthesize navigationBar = _navigationBar;
-@synthesize toolbar = _toolbar;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -64,13 +56,6 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
         [self pushViewController:rootViewController withTransition:nil];
     }
     return self;
-}
-
-- (void)dealloc {
-    [_transitions release], _transitions = nil;
-    [_viewControllers release], _viewControllers = nil;
-    [_navigationBar release], _navigationBar = nil;
-    [super dealloc];
 }
 
 - (void)loadView {
@@ -103,7 +88,6 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
     _containerView.autoresizesSubviews = YES;
     _containerView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [self.view addSubview:_containerView];
-    [_containerView release];
     
     // Add previous view controllers to the container and create navigation items
     NSMutableArray * items = [[NSMutableArray alloc] init];
@@ -117,12 +101,11 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
         
         UINavigationItem * navigationItem = viewController.navigationItem;
         if (!navigationItem) {
-            navigationItem = [[[UINavigationItem alloc] initWithTitle:viewController.title] autorelease];
+            navigationItem = [[UINavigationItem alloc] initWithTitle:viewController.title];
         }
         [items addObject:navigationItem];
     }
     [_navigationBar setItems:items];
-    [items release];
 
     [_toolbar setItems:[[self.viewControllers lastObject] toolbarItems]];
 }
@@ -191,7 +174,7 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
         return;
     }
     
-    objc_setAssociatedObject(viewController, ADTransitionControllerAssociationKey, self, OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(viewController, @selector(transitionController), self, OBJC_ASSOCIATION_ASSIGN);
     
     UIViewController * viewControllerToRemoveFromView = [_viewControllers lastObject];
     
@@ -230,7 +213,7 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
     
     UINavigationItem * navigationItem = viewController.navigationItem;
     if (!navigationItem) {
-        navigationItem = [[[UINavigationItem alloc] initWithTitle:viewController.title] autorelease];
+        navigationItem = [[UINavigationItem alloc] initWithTitle:viewController.title];
     }
     if (animated) {
         _isNavigationBarTransitioning = YES;
@@ -310,7 +293,7 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
         [outViewControllers addObject:_viewControllers[i]];
     }
     
-    ADTransition * lastTransition = [[_transitions lastObject] retain];
+    ADTransition * lastTransition = [_transitions lastObject];
     // Remove all viewControllers and transitions from stack
     for (UIViewController * viewController in outViewControllers) {
         [_viewControllers removeLastObject];
@@ -320,7 +303,6 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
     }
     // and re-add last transition to keep the right count and to pop it later
     [_transitions addObject:lastTransition];
-    [lastTransition release];
     
     // Set up navigation bar items
     NSMutableArray * items = [[NSMutableArray alloc] initWithCapacity:(_viewControllers.count - indexInViewController - 1)];
@@ -330,7 +312,6 @@ NSString * ADTransitionControllerAssociationKey = @"ADTransitionControllerAssoci
     // add last item to keep the right count and to pop it later
     [items addObject:[_navigationBar.items lastObject]];
     [_navigationBar setItems:items];
-    [items release];
     
     // Push last view controller on stack to pop it later
     UIViewController * outViewController = [outViewControllers lastObject];

@@ -9,12 +9,10 @@
 #import "UIViewController+ADTransitionController.h"
 #import <objc/runtime.h>
 
-extern NSString * ADTransitionControllerAssociationKey;
-
 @implementation UIViewController (ADTransitionController)
 
 - (ADTransitionController *)transitionController {
-    return (ADTransitionController *)objc_getAssociatedObject(self, ADTransitionControllerAssociationKey);
+    return (ADTransitionController *)objc_getAssociatedObject(self, @selector(transitionController));
 }
 
 @end

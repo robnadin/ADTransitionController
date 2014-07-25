@@ -13,14 +13,6 @@
 @end
 
 @implementation ADTransformTransition
-@synthesize inLayerTransform = _inLayerTransform;
-@synthesize outLayerTransform = _outLayerTransform;
-@synthesize animation = _animation;
-
-- (void)dealloc {
-    [_animation release], _animation = nil;
-    [super dealloc];
-}
 
 - (id)initWithAnimation:(CAAnimation *)animation inLayerTransform:(CATransform3D)inTransform outLayerTransform:(CATransform3D)outTransform {
     if (self = [super init]) {
@@ -54,7 +46,7 @@
     } else if (self.type == ADTransitionTypePop) {
         reversedTransition.type = ADTransitionTypePush;
     }
-    return [reversedTransition autorelease];
+    return reversedTransition;
 }
 
 - (NSTimeInterval)duration {

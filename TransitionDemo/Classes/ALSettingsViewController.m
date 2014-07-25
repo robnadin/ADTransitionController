@@ -22,36 +22,26 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-        _speed = [[defaults objectForKey:AL_SPEED_KEY] floatValue];
-        _orientation = [[defaults objectForKey:AL_ORIENTATION_KEY] intValue];
-        _navigationBarHidden = [[defaults objectForKey:AL_NAVIGATION_BAR_HIDDEN_KEY] boolValue];
-        _toolbarHidden = [[defaults objectForKey:AL_TOOLBAR_HIDDEN_KEY] boolValue];
-        self.title = @"Settings";
+        [self commonInit];
     }
     return self;
 }
 
-- (void)dealloc {
-    [_tableView release];
-    [_speedLabel release];
-    [_slider release];
-    [_navigationBarSwitch release];
-    [_scrollView release];
-    [_creditView release];
-    [_toolbarSwitch release];
-    [super dealloc];
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        [self commonInit];
+    }
+    return self;
 }
 
-- (void)viewDidUnload {
-    [self setTableView:nil];
-    [self setSpeedLabel:nil];
-    [self setSlider:nil];
-    [self setNavigationBarSwitch:nil];
-    [self setScrollView:nil];
-    [self setCreditView:nil];
-    [self setToolbarSwitch:nil];
-    [super viewDidUnload];
+- (void)commonInit {
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    _speed = [[defaults objectForKey:AL_SPEED_KEY] floatValue];
+    _orientation = [[defaults objectForKey:AL_ORIENTATION_KEY] intValue];
+    _navigationBarHidden = [[defaults objectForKey:AL_NAVIGATION_BAR_HIDDEN_KEY] boolValue];
+    _toolbarHidden = [[defaults objectForKey:AL_TOOLBAR_HIDDEN_KEY] boolValue];
+    self.title = @"Settings";
 }
 
 - (void)viewDidLoad {
@@ -64,7 +54,6 @@
     
     UIBarButtonItem * doneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
     self.navigationItem.rightBarButtonItem = doneButtonItem;
-    [doneButtonItem release];
 }
 
 - (IBAction)toggleNavigationBar:(UISwitch *)sender {
@@ -99,7 +88,8 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    ALSettingsTableViewCell * cell = [[ALSettingsTableViewCell newCell] autorelease];
+    static NSString * sCellIdentifier = @"CellIdentifier";
+    ALSettingsTableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:sCellIdentifier forIndexPath:indexPath];
     
     NSString * text = nil;
     switch (indexPath.row) {

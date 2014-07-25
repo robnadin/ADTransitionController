@@ -3,7 +3,6 @@
 ADTransitionController brings all the power of the Core Animation framework to your apps with nice pre-defined transitions.
 
 * For apps supporting iOS 7 and beyond, we have a very generic API that uses the new `UIViewControllerTransitioningDelegate` protocol, making it usable for any transition (navigation, modal, tab bar).
-* If you also need to support iOS 6, we give you a drop-in replacement for UINavigationController that adds support for our transitions.
 
 ## Installation
 
@@ -18,18 +17,9 @@ ADTransitionController brings all the power of the Core Animation framework to y
 2. In your terminal run `$ pod install` and open your workspace `$ open yourApp.xcworkspace`
 3. Import `<ADTransitionController.h>` in your project
 
-### ARC
-
-If you are working on an ARC project, use the `-fno-objc-arc` flag in *Build Phases > Compile Sources*.
-![Compilation Flag For ARC](http://applidium.github.io/ADTransitionController/images/fno-objc_arc.png)
-
 ## Example
 
-Your project is now ready to take advantage of `ADTransitionController`. Here are two examples of how to use it. One if you plan to develop for iOS 7 and later, the other one if you want to support iOS 6 too.
-
-### iOS 7 and later
-
-We're making use of the new `UIViewControllerTransitioningDelegate` protocol. The API provided by Apple is quite complex, but we made it very simple to use.
+Your project is now ready to take advantage of `ADTransitionController`. We're making use of the new `UIViewControllerTransitioningDelegate` protocol. The API provided by Apple is quite complex, but we made it very simple to use.
 
 #### In short:
 1. Set the delegate of your navigation controller to the one that we give you.
@@ -84,71 +74,6 @@ To sum up, we provide three different classes you may want to use :
 * `ADNavigationControllerDelegate` : used when you setup your navigation controller to perform custom animations
 * `ADTransitioningViewController` : used for your view controllers to control their transitions
 * `ADTransitioningDelegate` : used only if you can't inherit from `ADTransitioningViewController` and need to specify the transitioning delegate for the view controller
-
-### iOS 6 and later
- 
-If you need to support earlier versions of iOS, this is possible. Just use `ADTransitionController` instead of `UINavigationController`.
-
-Instantiate an `ADTransitionController` like a `UINavigationController`:
-
-```objective-c
-UIViewController * viewController = [[UIViewController alloc] init];
-ADTransitionController * transitionController = [[ADTransitionController alloc] initWithRootViewController:viewController];
-[viewController release];
-self.window.rootViewController = transitionController;
-[transitionController release];
-```
-
-To push a viewController on the stack, instantiate an `ADTransition` and use the `pushViewController:withTransition:` method.
-
-```objective-c
-- (IBAction)pushWithCube:(id)sender {
-    UIViewController * viewController = [[UIViewController alloc] init];
-    ADTransition * transition = [[ADCubeTransition alloc] initWithDuration:0.25f orientation:ADTransitionRightToLeft sourceRect:self.view.frame];
-    [self.transitionController pushViewController:viewController withTransition:transition];
-    [transition release];
-    [viewController release];
-}
-```
-
-To pop a viewController from the stack, just use the `popViewController` method.
-
-```objective-c
-- (IBAction)pop:(id)sender {
-    [self.transitionController popViewController];
-}
-```
-
-#### Note
-When a `UIViewController` is pushed onto the stack of view controllers, the property `transitionController` becomes available to the controller (see example above: `self.transitionController`). This way, an `ADTransitionController` can be used like a `UINavigationController`.
-
-## ADTransition subclasses
-
-For now, the built-in transitions available are the following. Try out [our demo application](https://github.com/applidium/ADTransitionController/archive/master.zip) to see them in action! 
-
-`ADCarrouselTransition`, `ADCubeTransition`, `ADCrossTransition`, `ADFlipTransition`, `ADSwapTransition`, `ADFadeTransition`, `ADBackFadeTransition`, `ADGhostTransition`, `ADZoomTransition`, `ADSwipeTransition`, `ADSwipeFadeTransition`, `ADScaleTransition`, `ADGlueTransition`, `ADPushRotateTransition`, `ADFoldTransition`, `ADSlideTransition`.
-
-## ADTransitionController API
-
-The `ADTransitionController` API is fully inspired by the `UINavigationController`, to be very easy to integrate in your projects. The few differences between the two APIs are presented below.
-
-### Methods
-
-The point of `ADTransitionController` is to be able to customize the animations for a transition between two `UIViewController` instances. Here are the methods we added to let you take advantage of the built-in transitions: 
-
-```objective-c
-- (void)pushViewController:(UIViewController *)viewController withTransition:(ADTransition *)transition;
-- (UIViewController *)popViewControllerWithTransition:(ADTransition *)transition;
-- (NSArray *)popToViewController:(UIViewController *)viewController withTransition:(ADTransition *)transition;
-- (NSArray *)popToRootViewControllerWithTransition:(ADTransition *)transition;
-```
-
-Here are the convention for the push and pop actions:   
-
-- pass `nil` to the transition parameter to disable the animation. Thus the transition won't be animated.
-- pass an `ADTransition` instance to the transition parameter to animate the push action.
-- by default the pop action uses the *reverse animation* used for the push action. However you can pass a different transition to the transition parameter to change this behavior.
-
 
 ### Delegate
 
